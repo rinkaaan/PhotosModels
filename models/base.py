@@ -1,5 +1,4 @@
-import uuid
-
+from ksuid import Ksuid
 from sqlalchemy import Column, String, DateTime, ColumnElement, Text, Table, ForeignKey
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import relationship
@@ -12,8 +11,8 @@ Base = declarative_base()
 
 class AlbumModel(Base, BaseExtended):
     __tablename__ = "albums"
-    id = Column(String(length=36), primary_key=True, default=str(uuid.uuid4()))
-    created_at: ColumnElement = Column(DateTime(), index=True, default=get_timestamp())
+    id = Column(String(length=27), primary_key=True, default=str(Ksuid()))
+    created_at: ColumnElement = Column(DateTime(), default=get_timestamp())
     updated_at: ColumnElement = Column(DateTime(), index=True, default=get_timestamp())
     name = Column(Text(), index=True)
     thumbnail_path = Column(String())
@@ -23,9 +22,9 @@ class AlbumModel(Base, BaseExtended):
 
 class MediaModel(Base, BaseExtended):
     __tablename__ = "media"
-    id = Column(String(length=36), primary_key=True, default=str(uuid.uuid4()))
-    created_at: ColumnElement = Column(DateTime(), index=True, default=get_timestamp())
-    updated_at: ColumnElement = Column(DateTime(), index=True, default=get_timestamp())
+    id = Column(String(length=27), primary_key=True, default=str(Ksuid()))
+    created_at: ColumnElement = Column(DateTime(), default=get_timestamp())
+    updated_at: ColumnElement = Column(DateTime(), default=get_timestamp())
     title = Column(Text(), index=True)
     thumbnail_path = Column(String())
     albums = relationship("AlbumModel", secondary="media_albums", back_populates="media")
@@ -35,6 +34,6 @@ class MediaModel(Base, BaseExtended):
 association_table = Table(
     "media_albums",
     Base.metadata,
-    Column("media_id", String(length=36), ForeignKey("media.id")),
-    Column("album_id", String(length=36), ForeignKey("albums.id")),
+    Column("media_id", String(length=36), ForeignKey("media.id"), primary_key=True),
+    Column("album_id", String(length=36), ForeignKey("albums.id"), primary_key=True),
 )
