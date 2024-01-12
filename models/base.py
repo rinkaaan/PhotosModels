@@ -1,9 +1,9 @@
 from ksuid import Ksuid
-from sqlalchemy import Column, String, DateTime, ColumnElement, Text, Table, ForeignKey
+from sqlalchemy import Column, String, DateTime, ColumnElement, Text, Table, ForeignKey, Integer
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import relationship
 
-from nguylinc_python_utils.misc import get_timestamp
+from nguylinc_python_utils.misc import get_timestamp, get_ksuid
 from nguylinc_python_utils.sqlalchemy import BaseExtended
 
 Base = declarative_base()
@@ -11,10 +11,10 @@ Base = declarative_base()
 
 class AlbumModel(Base, BaseExtended):
     __tablename__ = "albums"
-    id = Column(String(length=27), primary_key=True, default=str(Ksuid()))
-    created_at: ColumnElement = Column(DateTime(), default=get_timestamp())
-    updated_at: ColumnElement = Column(DateTime(), index=True, default=get_timestamp())
-    name = Column(Text(), index=True)
+    id = Column(String(length=27), primary_key=True, default=get_ksuid)
+    created_at: ColumnElement = Column(DateTime(), default=get_timestamp)
+    updated_at: ColumnElement = Column(DateTime(), index=True, default=get_timestamp)
+    name = Column(Text(), index=True, unique=True)
     thumbnail_path = Column(String())
     serializable_fields = ["id", "created_at", "updated_at", "name", "thumbnail_path"]
     media = relationship("MediaModel", secondary="media_albums", back_populates="albums")
@@ -23,10 +23,12 @@ class AlbumModel(Base, BaseExtended):
 class MediaModel(Base, BaseExtended):
     __tablename__ = "media"
     id = Column(String(length=27), primary_key=True, default=str(Ksuid()))
-    created_at: ColumnElement = Column(DateTime(), default=get_timestamp())
-    updated_at: ColumnElement = Column(DateTime(), default=get_timestamp())
+    created_at: ColumnElement = Column(DateTime(), default=get_timestamp)
+    updated_at: ColumnElement = Column(DateTime(), default=get_timestamp, index=True)
     title = Column(Text(), index=True)
     thumbnail_path = Column(String())
+    webpage_url = Column(String())
+    duration = Integer()
     albums = relationship("AlbumModel", secondary="media_albums", back_populates="media")
     serializable_fields = ["id", "created_at", "updated_at", "title", "thumbnail_path"]
 
