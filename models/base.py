@@ -16,7 +16,6 @@ class AlbumModel(Base, BaseExtended):
     updated_at: ColumnElement = Column(DateTime(), index=True, default=get_timestamp)
     name = Column(Text(), index=True, unique=True)
     thumbnail_path = Column(String())
-    serializable_fields = ["id", "created_at", "updated_at", "name", "thumbnail_path"]
     media = relationship("MediaModel", secondary="media_albums", back_populates="albums")
 
 
@@ -24,13 +23,11 @@ class MediaModel(Base, BaseExtended):
     __tablename__ = "media"
     id = Column(String(length=27), primary_key=True, default=str(Ksuid()))
     created_at: ColumnElement = Column(DateTime(), default=get_timestamp)
-    updated_at: ColumnElement = Column(DateTime(), default=get_timestamp, index=True)
-    title = Column(Text(), index=True)
+    uploaded_at: ColumnElement = Column(String())
     thumbnail_path = Column(String())
+    duration = Column(Integer(), index=True)
     webpage_url = Column(String())
-    duration = Integer()
     albums = relationship("AlbumModel", secondary="media_albums", back_populates="media")
-    serializable_fields = ["id", "created_at", "updated_at", "title", "thumbnail_path"]
 
 
 association_table = Table(
